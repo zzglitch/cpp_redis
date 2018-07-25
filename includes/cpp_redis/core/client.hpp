@@ -234,6 +234,15 @@ public:
   }
 
 private:
+	//!
+	//! struct to store commands information (command to be sent and callback to be called)
+	//!
+	struct command_request {
+		std::vector<std::string> command;
+		reply_callback_t callback;
+	};
+
+private:
   //!
   //! \return whether a reconnection attempt should be performed
   //!
@@ -242,10 +251,10 @@ private:
   //!
   //! resend all pending commands that failed to be sent due to disconnection
   //!
-  void resend_failed_commands(void);
+  void resend_failed_commands(std::queue<command_request> & commands);
 
   //!
-  //! sleep between two reconnect attemps if necessary
+  //! sleep between two reconnect attempts if necessary
   //!
   void sleep_before_next_reconnect_attempt(void);
 
@@ -1379,15 +1388,6 @@ private:
 
 private:
   //!
-  //! struct to store commands information (command to be sent and callback to be called)
-  //!
-  struct command_request {
-    std::vector<std::string> command;
-    reply_callback_t callback;
-  };
-
-private:
-  //!
   //! server we are connected to
   //!
   std::string m_redis_server;
@@ -1438,11 +1438,11 @@ private:
   //!
   //! reconnection status
   //!
-  std::atomic_bool m_reconnecting;
+  std::atomic<bool> m_reconnecting;
   //!
   //! to force cancel reconnection
   //!
-  std::atomic_bool m_cancel;
+  std::atomic<bool> m_cancel;
 
   //!
   //! sent commands waiting to be executed

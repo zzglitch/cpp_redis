@@ -91,7 +91,9 @@ client::client_kill(const T& arg, const Ts&... args) {
 template <typename T, typename... Ts>
 inline client&
 client::client_kill(const std::string& host, int port, const T& arg, const Ts&... args) {
+#if SUPPORTS_CONSTEXPR
   static_assert(helpers::is_different_types<T, Ts...>::value, "Should only have one distinct value per filter type");
+#endif
   std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
 
   //! If we have other type than lambda, then it's a filter

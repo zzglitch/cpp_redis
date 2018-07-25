@@ -218,7 +218,7 @@ client::try_commit(void) {
   catch (const cpp_redis::redis_error& e) {
     __CPP_REDIS_LOG(error, "cpp_redis::client could not send pipelined commands");
     //! ensure commands are flushed
-    clear_callbacks();
+    //clear_callbacks();
     throw e;
   }
 }
@@ -280,13 +280,10 @@ client::clear_callbacks(void) {
 }
 
 void
-client::resend_failed_commands(void) {
-  if (m_commands.empty()) {
+client::resend_failed_commands(std::queue<command_request> & commands) {
+  if (commands.empty()) {
     return;
   }
-
-  //! dequeue commands and move them to a local variable
-  std::queue<command_request> commands = std::move(m_commands);
 
   while (commands.size() > 0) {
     //! Reissue the pending command and its callback.
@@ -419,9 +416,12 @@ client::reconnect(void) {
 
   __CPP_REDIS_LOG(info, "client reconnected ok");
 
+  //! move pending commands to a local variable so auth and select are first in queue
+  std::queue<command_request> commands = std::move(m_commands);
+
   re_auth();
   re_select();
-  resend_failed_commands();
+  resend_failed_commands(commands);
   try_commit();
 }
 

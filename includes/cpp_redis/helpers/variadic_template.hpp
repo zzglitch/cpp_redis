@@ -27,6 +27,12 @@
 namespace cpp_redis {
 namespace helpers {
 
+#define SUPPORTS_CONSTEXPR 1
+#if defined(_MSC_VER) && _MSC_VER < 1900 //VS2015
+	#undef SUPPORTS_CONSTEXPR
+	#define SUPPORTS_CONSTEXPR 0
+#endif
+
 //!
 //! type traits to return last element of a variadic list
 //!
@@ -60,6 +66,8 @@ struct front {
   using type = T;
 };
 
+
+#if SUPPORTS_CONSTEXPR
 //!
 //! type traits to check if type is present in variadic list
 //!
@@ -110,6 +118,8 @@ struct is_different_types<T1> {
   //!
   static constexpr bool value = true;
 };
+
+#endif
 
 } // namespace helpers
 
