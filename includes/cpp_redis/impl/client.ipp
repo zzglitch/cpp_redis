@@ -78,7 +78,9 @@ client::client_kill_impl(std::vector<std::string>& redis_cmd, reply_callback_t& 
 template <typename T, typename... Ts>
 inline client&
 client::client_kill(const T& arg, const Ts&... args) {
+#if SUPPORTS_CONSTEXPR //PRIMAL - DK
   static_assert(helpers::is_different_types<T, Ts...>::value, "Should only have one distinct value per filter type");
+#endif
   static_assert(!(std::is_class<T>::value && std::is_same<T, typename helpers::back<T, Ts...>::type>::value), "Should have at least one filter");
 
   std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
@@ -91,7 +93,7 @@ client::client_kill(const T& arg, const Ts&... args) {
 template <typename T, typename... Ts>
 inline client&
 client::client_kill(const std::string& host, int port, const T& arg, const Ts&... args) {
-#if SUPPORTS_CONSTEXPR
+#if SUPPORTS_CONSTEXPR //PRIMAL - DK
   static_assert(helpers::is_different_types<T, Ts...>::value, "Should only have one distinct value per filter type");
 #endif
   std::vector<std::string> redis_cmd({"CLIENT", "KILL"});
