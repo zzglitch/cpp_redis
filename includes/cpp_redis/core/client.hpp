@@ -1314,6 +1314,9 @@ public:
   client& zunionstore(const std::string& destination, std::size_t numkeys, const std::vector<std::string>& keys, const std::vector<std::size_t> weights, aggregate_method method, const reply_callback_t& reply_callback);
   std::future<reply> zunionstore(const std::string& destination, std::size_t numkeys, const std::vector<std::string>& keys, const std::vector<std::size_t> weights, aggregate_method method);
 
+  client& xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members, const reply_callback_t& reply_callback);
+  std::future<reply> xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members);
+
 private:
   //! client kill impl
   template <typename T>

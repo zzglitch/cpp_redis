@@ -2709,6 +2709,26 @@ client::zunionstore(const std::string& destination, std::size_t numkeys, const s
   return *this;
 }
 
+client&
+client::xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members, const reply_callback_t& reply_callback) {
+	std::vector<std::string> cmd = { "XADD", key };
+
+	//! options
+	cmd.insert(cmd.end(), options.begin(), options.end());
+
+	//! stream id
+	cmd.push_back(id);
+
+	//! score members
+	for (auto& sm : stream_members) {
+		cmd.push_back(sm.first);
+		cmd.push_back(sm.second);
+	}
+
+	send(cmd, reply_callback);
+	return *this;
+}
+
 //!
 //! Redis Commands
 //! std::future-based
@@ -4028,6 +4048,12 @@ client::zscore(const std::string& key, const std::string& member) {
 std::future<reply>
 client::zunionstore(const std::string& destination, std::size_t numkeys, const std::vector<std::string>& keys, const std::vector<std::size_t> weights, aggregate_method method) {
   return exec_cmd([=](const reply_callback_t& cb) -> client& { return zunionstore(destination, numkeys, keys, weights, method, cb); });
+}
+
+
+std::future<reply>
+client::xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members) {
+	return exec_cmd([=](const reply_callback_t& cb) -> client& { return xadd(key, options, id, stream_members, cb); });
 }
 
 } //! cpp_redis
