@@ -2729,6 +2729,27 @@ client::xadd(const std::string& key, const std::vector<std::string>& options, co
 	return *this;
 }
 
+
+client&
+client::xread(const std::vector<std::string>& options, const std::vector<std::string>& keys, const std::vector<std::string>& ids, const reply_callback_t& reply_callback) {
+  std::vector<std::string> cmd = { "XREAD" };
+
+  //! options
+  cmd.insert(cmd.end(), options.begin(), options.end());
+
+  //! STREAMS
+  cmd.push_back("STREAMS");
+
+  //! keys
+  cmd.insert(cmd.end(), keys.begin(), keys.end());
+
+  //! ids
+  cmd.insert(cmd.end(), ids.begin(), ids.end());
+
+  send(cmd, reply_callback);
+  return *this;
+}
+
 //!
 //! Redis Commands
 //! std::future-based
@@ -4054,6 +4075,11 @@ client::zunionstore(const std::string& destination, std::size_t numkeys, const s
 std::future<reply>
 client::xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members) {
 	return exec_cmd([=](const reply_callback_t& cb) -> client& { return xadd(key, options, id, stream_members, cb); });
+}
+
+std::future<reply>
+client::xread(const std::vector<std::string>& options, const std::vector<std::string>& keys, const std::vector<std::string>& ids) {
+  return exec_cmd([=](const reply_callback_t& cb) -> client& { return xread(options, keys, ids, cb); });
 }
 
 } //! cpp_redis

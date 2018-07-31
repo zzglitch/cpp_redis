@@ -1317,7 +1317,10 @@ public:
   client& xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members, const reply_callback_t& reply_callback);
   std::future<reply> xadd(const std::string& key, const std::vector<std::string>& options, const std::string& id, const std::multimap<std::string, std::string>& stream_members);
 
-private:
+  client& xread(const std::vector<std::string>& options, const std::vector<std::string>& keys, const std::vector<std::string>& ids, const reply_callback_t& reply_callback);
+  std::future<reply> xread(const std::vector<std::string>& options, const std::vector<std::string>& keys, const std::vector<std::string>& ids);
+
+    private:
   //! client kill impl
   template <typename T>
   typename std::enable_if<std::is_same<T, client_type>::value>::type
